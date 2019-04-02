@@ -10,4 +10,4 @@ purs-build:
 	psc-package build
 
 parcel-build:
-	./node_modules/.bin/parcel build html/index.html -d ./docs/
+	./node_modules/.bin/parcel build html/index.html -d ./docs/ --public-url ./

@@ -760,4 +760,4 @@ var e=arguments[3];Object.defineProperty(exports,"__esModule",{value:!0});var n=
 },{"../Container/index.js":"71MK","../Control.Bind/index.js":"9Xhy","../Data.Function/index.js":"x2Ry","../Data.Functor/index.js":"OKei","../Data.Maybe/index.js":"TY1c","../Effect/index.js":"Y1mj","../Effect.Exception/index.js":"Wtfo","../Prelude/index.js":"XhfO","../React.Basic/index.js":"YegM","../React.Basic.DOM/index.js":"JPyS","../React.Basic.Hooks/index.js":"ewXr","../Web.DOM.NonElementParentNode/index.js":"HYas","../Web.HTML/index.js":"aYQo","../Web.HTML.HTMLDocument/index.js":"JO9i","../Web.HTML.Window/index.js":"M2Jl"}],"Focm":[function(require,module,exports) {
 require("../output/Main/index.js").main();
 },{"../output/Main/index.js":"+sKI"}]},{},["Focm"], null)
-//# sourceMappingURL=/html.b1bd1c9e.js.map
+//# sourceMappingURL=html.b1bd1c9e.js.map
