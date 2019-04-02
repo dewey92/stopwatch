@@ -10,4 +10,4 @@ purs-build:
 	psc-package build
 
 parcel-build:
-	./node_modules/.bin/parcel build html/index.html && ln -s dist/index.html ./index.html
+	./node_modules/.bin/parcel build html/index.html -d ./docs/
