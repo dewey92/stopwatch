@@ -1,0 +1,17 @@
+{
+  "name": "stopwatch",
+  "set": "psc-0.12.3-20190330",
+  "source": "https://github.com/purescript/package-sets.git",
+  "depends": [
+    "console",
+    "debug",
+    "effect",
+    "js-timers",
+    "newtype",
+    "prelude",
+    "psci-support",
+    "react-basic",
+    "react-basic-hooks",
+    "globals"
+  ]
+}
