@@ -25,6 +25,7 @@ derive instance newtypeMs :: Newtype Milliseconds _
 derive newtype instance semiringMs :: Semiring Milliseconds
 derive newtype instance ringMs :: Ring Milliseconds
 derive newtype instance eqMs :: Eq Milliseconds
+derive newtype instance ordMs :: Ord Milliseconds
 
 class ToMilliseconds t where
   toMilliseconds :: t -> Milliseconds
@@ -73,7 +74,7 @@ msToStyle original (Milliseconds remaining) = percentToCss msToPercent
 
 -- | Reducer actions
 data Actions = Start TimeUnit | Update | Pause | Resume | Reset
-data Progress = Started | Paused | Stopped
+data Progress = Running | Paused | Stopped
 derive instance eqProgress :: Eq Progress
 
 -- | State
@@ -88,20 +89,25 @@ initialState =
   , msRemaining: zero
   }
 
+reducer :: State -> Actions -> State
+reducer state = case _ of
+  (Start timeUnit) ->
+    if state.progress == Paused || state.progress == Stopped
+    then state { progress = Running, msRemaining = toMilliseconds timeUnit }
+    else state { msRemaining = toMilliseconds timeUnit }
+  Update ->
+    let newRemaining = state.msRemaining - intervalTime
+    in if (newRemaining <= zero)
+          then reducer state Reset
+          else state { msRemaining = newRemaining }
+  Pause -> state { progress = Paused }
+  Resume -> state { progress = Running }
+  Reset -> initialState
+
 -- | THE component
 stopwatch :: CreateComponent {}
 stopwatch = component "Stopwatch" \props -> React.do
-  state /\ dispatch <-
-    React.useReducer initialState \state -> case _ of
-      (Start timeUnit) ->
-        if state.progress == Paused || state.progress == Stopped
-           then state { progress = Started, msRemaining = toMilliseconds timeUnit }
-           else state { msRemaining = toMilliseconds timeUnit }
-      Update -> state { msRemaining = state.msRemaining - intervalTime }
-      Pause -> state { progress = Paused }
-      Resume -> state { progress = Started }
-      Reset -> initialState
-
+  state /\ dispatch <- React.useReducer initialState reducer
   timeAmount <- useInput "0"
   timeUnit <- useInput "seconds"
   intervalIdRef <- React.useRef null
@@ -113,14 +119,11 @@ stopwatch = component "Stopwatch" \props -> React.do
           (Just r) -> clearInterval r
           (Nothing) -> pure mempty
 
-
-  React.useEffect { run: state.progress == Started, rem: state.msRemaining } do
-    if state.progress == Started
+  React.useEffect state.progress do
+    let intervalTimeInInt = fromMaybe 0 (fromNumber $ unwrap intervalTime)
+    if state.progress == Running
        then do
-            intervalId <- setInterval (fromMaybe 0 (fromNumber $ unwrap intervalTime)) do
-                          if unwrap state.msRemaining > 0.0
-                             then dispatch Update
-                             else dispatch Reset
+            intervalId <- setInterval intervalTimeInInt $ dispatch Update
             React.writeRef intervalIdRef (toNullable $ Just intervalId)
        else stopStopwatch
     pure $ stopStopwatch
@@ -167,7 +170,7 @@ stopwatch = component "Stopwatch" \props -> React.do
                   }
               , case state.progress of
                     Stopped -> mempty
-                    Started -> R.button { onClick: handler_ $ dispatch Pause, children: [ R.text "Pause" ] }
+                    Running -> R.button { onClick: handler_ $ dispatch Pause, children: [ R.text "Pause" ] }
                     Paused -> R.button { onClick: handler_ $ dispatch Resume, children: [ R.text "Resume" ] }
               , R.button { onClick: handler_ $ dispatch Reset, children: [R.text "Reset"] }
               ]
